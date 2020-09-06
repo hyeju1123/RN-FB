@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "90863777354",
+    "firebase_url": "https://wordcloud-4cae6.firebaseio.com",
+    "project_id": "wordcloud-4cae6",
+    "storage_bucket": "wordcloud-4cae6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90863777354:android:dcef3a88299f99b68858b3",
+        "android_client_info": {
+          "package_name": "com.healthfunc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "90863777354-f8isnbrco4bpnc7amhmu01hk955lohhn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXk5b4BywJ3GHjudyZ3JT7i0P6iDruPqw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "90863777354-f8isnbrco4bpnc7amhmu01hk955lohhn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
