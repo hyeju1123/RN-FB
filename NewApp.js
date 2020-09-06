@@ -1,76 +1,134 @@
-// https://aboutreact.com/example-of-image-picker-in-react-native/#AndroidPermission-to-use-the-Camera-and-to-Read-the-Storage
-import React from 'react';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Alert,
+  Image,
+} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      filePath: {},
-    };
-  }
-  chooseFile = () => {
-    var options = {
-      title: 'Select Image',
-      customButtons: [
-        { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-      ],
+import storage from '@react-native-firebase/storage';
+
+
+export default function NewApp() {
+  const [ image, setImage ] = useState(null);
+  const [ uploading, setUploading ] = useState(false);
+  const [ transferred, setTransferred ] = useState(0);
+
+  const selectImage = () => {
+    const options = {
+      maxWidth: 2000,
+      maxHeight: 2000,
       storageOptions: {
         skipBackup: true,
-        path: 'images',
-      },
+        path: 'images'
+      }
     };
     ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
       } else {
-        let source = response;
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-        this.setState({
-          filePath: source,
-        });
+        const source = { uri: response.uri };
+        console.log(source);
+        setImage(source);
       }
     });
   };
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={styles.container}>
-          {/*<Image 
-          source={{ uri: this.state.filePath.path}} 
-          style={{width: 100, height: 100}} />*/}
-          <Image
-            source={{
-              uri: 'data:image/jpeg;base64,' + this.state.filePath.data,
-            }}
-            style={{ width: 100, height: 100 }}
-          />
-          <Image
-            source={{ uri: this.state.filePath.uri }}
-            style={{ width: 250, height: 250 }}
-          />
-          <Text style={{ alignItems: 'center' }}>
-            {this.state.filePath.uri}
-          </Text>
-          <Button title="Choose File" onPress={this.chooseFile.bind(this)} />
-        </View>
-      </View>
+
+  const uploadImage = async () => {
+    const { uri } = image;
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const uploadUri = Platform.OS === 'ios' ?  uri.replace('file://', '') : uri;
+
+    setUploading(true);
+    setTransferred(0);
+
+    const task = storage()
+      .ref(filename)
+      .putFile(uploadUri);
+
+    try {
+      await task;
+    } catch (e) {
+      console.log(e);
+    }
+
+    setUploading(false);
+
+    Alert.alert(
+      'photo uploaded',
+      'Your Photo has been uploaded to Firebase Cloud Stroage'
     );
+
+    setImage(null);
   }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.selectButton} onPress={selectImage}>
+        <Text style={styles.buttonText}>Pick an image</Text>
+      </TouchableOpacity>
+      <View style={styles.imageContainer}>
+        { image !== null ? (
+          <Image source={{ uri: image.uri }} style={styles.imageBox} />
+        ) : null }
+        { uploading ? (
+          <Text>uploading...</Text>
+        ) : (
+          <TouchableOpacity style={styles.uploadButton} onPress={uploadImage}>
+            <Text style={styles.buttonText}>Upload image</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </SafeAreaView>
+  )
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    alignItems: 'center',
+    backgroundColor: '#bbded6'
+  },
+  selectButton: {
+    borderRadius: 5,
+    width: 150,
+    height: 50,
+    backgroundColor: '#8ac6d1',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  uploadButton: {
+    borderRadius: 5,
+    width: 150,
+    height: 50,
+    backgroundColor: '#ffb6b9',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20
   },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  imageContainer: {
+    marginTop: 30,
+    marginBottom: 50,
+    alignItems: 'center'
+  },
+  progressBarContainer: {
+    marginTop: 20
+  },
+  imageBox: {
+    width: 300,
+    height: 300
+  }
 });
