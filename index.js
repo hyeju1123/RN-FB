@@ -3,7 +3,7 @@
  */
 
 import {AppRegistry} from 'react-native';
-import App from './NewApp';
 import {name as appName} from './app.json';
+import PictureList from './src/PictureLIst';
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => PictureList);
